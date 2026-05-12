@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermer Kesim Hesap Makinesi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #2c3e50;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .settings-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .setting-item label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .setting-item input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        
+        .setting-item input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            bottom: -2px;
+        }
+        
+        .tab-btn:hover {
+            color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .tab-btn.active {
+            color: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .card h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #2c3e50;
+        }
+        
+        table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+        
+        .metric {
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .metric.highlight {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .metric.highlight .metric-label {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .metric.highlight .metric-value {
+            color: white;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            color: #2c3e50;
+        }
+        
+        button:hover {
+            background: #f8f9fa;
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        button.primary {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        button.primary:hover {
+            background: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        button.danger {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
+        button.danger:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .formula-box {
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-size: 12px;
+            color: #2c3e50;
+            line-height: 1.8;
+            font-family: "Courier New", monospace;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 13px;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left-color: #1976d2;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+        }
+        
+        .empty-state p {
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-btn {
+                flex: 1 0 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Mermer Kesim Hesap Makinesi</h1>
+        <p>Detaylı marjin ve maliyet hesaplaması ile kesim fiyatlandırması</p>
+    </div>
+    
+    <div class="settings-panel">
+        <h2 style="margin-bottom: 1rem;">Genel Ayarlar</h2>
+        <div class="settings-grid">
+            <div class="setting-item">
+                <label>Fire Oranı (%)</label>
+                <input type="number" id="fireRate" value="30" min="0" max="100" step="1">
+            </div>
+            <div class="setting-item">
+                <label>Atölye Kesim Maliyeti (₺/m²)</label>
+                <input type="number" id="workshopRate" value="500" min="0" step="1">
+            </div>
+            <div class="setting-item">
+                <label>Delta Kârı (%)</label>
+                <input type="number" id="profitRate" value="35" min="0" max="100" step="1">
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('master')">Plakaları Yönet</button>
+        <button class="tab-btn" onclick="switchTab('calculate')">Kesim Hesapla</button>
+        <button class="tab-btn" onclick="switchTab('history')">Geçmiş Hesaplamalar</button>
+    </div>
+    
+    <!-- MASTER DATA TAB -->
+    <div id="master" class="tab-content active">
+        <div class="card">
+            <h2>Yeni Plaka Ekle</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Plaka İsmi</label>
+                    <input type="text" id="plateName" placeholder="Örn: Premium Beyaz Mermer">
+                </div>
+                <div class="form-group">
+                    <label>m² Fiyatı (₺)</label>
+                    <input type="number" id="platePrice" placeholder="1300.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Kesim Alanı (m²)</label>
+                    <input type="number" id="plateSqm" placeholder="0.8220" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label>Not</label>
+                    <input type="text" id="plateNote" placeholder="Opsiyonel">
+                </div>
+            </div>
+            
+            <button class="primary" onclick="addPlate()">Plaka Ekle</button>
+        </div>
+        
+        <div class="card">
+            <h2>Plaka Masteri</h2>
+            <div id="emptyPlates" class="empty-state" style="display: none;">
+                <p>Henüz plaka eklenmemiş.</p>
+            </div>
+            <div class="table-wrapper" id="plateTableWrapper" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Plaka İsmi</th>
+                            <th>m² Fiyatı</th>
+                            <th>m² Alan</th>
+                            <th>Toplam m² (Fire ile)</th>
+                            <th>Atölye Mal.</th>
+                            <th>Satış Fiyatı/m²</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="plateTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CALCULATE TAB -->
+    <div id="calculate" class="tab-content">
+        <div class="card">
+            <h2>Kesim Hesapla</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Müşteri Adı</label>
+                    <input type="text" id="customerName" placeholder="Müşteri adı">
+                </div>
+                <div class="form-group">
+                    <label>Plaka Seç</label>
+                    <select id="plateSelect">
+                        <option value="">-- Plaka Seçin --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Adet</label>
+                    <input type="number" id="quantity" value="1" min="1">
+                </div>
+            </div>
+            
+            <button class="primary" onclick="calculateCut()" style="width: 100%;">Hesapla</button>
+        </div>
+        
+        <div id="resultCard" class="card" style="display: none;">
+            <h2>Hesaplama Sonuçları</h2>
+            
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="metric-label">Toplam m²</div>
+                    <div class="metric-value" id="resultSqm">0.00</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Plaka Maliyeti</div>
+                    <div class="metric-value" id="resultPlateCost">₺0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Atölye Maliyeti</div>
+                    <div class="metric-value" id="resultWorkshopCost">₺0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Toplam Maliyet</div>
+                    <div class="metric-value" id="resultTotalCost">₺0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Delta Kârı</div>
+                    <div class="metric-value" id="resultProfit">₺0</div>
+                </div>
+                <div class="metric highlight">
+                    <div class="metric-label">SATIŞ FİYATI</div>
+                    <div class="metric-value" id="resultFinalPrice">₺0</div>
+                </div>
+            </div>
+            
+            <div class="formula-box">
+                <div style="margin-bottom: 0.5rem; font-weight: bold;">Formül Analizi:</div>
+                <div id="formulaBreakdown"></div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="saveCalculation()">Kaydet</button>
+                <button onclick="resetCalculator()">Yeni Hesaplama</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- HISTORY TAB -->
+    <div id="history" class="tab-content">
+        <div class="card">
+            <h2>Geçmiş Hesaplamalar</h2>
+            
+            <div id="emptyHistory" class="empty-state" style="display: none;">
+                <p>Henüz hesaplama kaydı yok.</p>
+            </div>
+            
+            <div class="table-wrapper" id="historyTableWrapper" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Müşteri</th>
+                            <th>Plaka</th>
+                            <th>Adet</th>
+                            <th>m²</th>
+                            <th>Satış Fiyatı</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable"></tbody>
+                </table>
+            </div>
+            
+            <button onclick="clearHistory()" style="margin-top: 1rem;">Geçmişi Temizle</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let plateData = JSON.parse(localStorage.getItem('plateData')) || [
+    { name: "Premium Beyaz Mermer", pricePerSqm: 1300, sqm: 0.8220, note: "Standart plaka" },
+    { name: "Siyah Mermer", pricePerSqm: 1100, sqm: 0.8220, note: "" },
+    { name: "Travertin", pricePerSqm: 800, sqm: 0.54, note: "" }
+];
+
+let calculations = JSON.parse(localStorage.getItem('calculations')) || [];
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+    
+    if (tabName === 'master') renderPlates();
+    if (tabName === 'history') renderHistory();
+}
+
+function getCalculationParams() {
+    return {
+        fireRate: parseFloat(document.getElementById('fireRate').value) || 0,
+        workshopRate: parseFloat(document.getElementById('workshopRate').value) || 0,
+        profitRate: parseFloat(document.getElementById('profitRate').value) || 0
+    };
+}
+
+function renderPlates() {
+    const params = getCalculationParams();
+    const tbody = document.getElementById('plateTable');
+    const wrapper = document.getElementById('plateTableWrapper');
+    const empty = document.getElementById('emptyPlates');
+    
+    if (plateData.length === 0) {
+        wrapper.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+    }
+    
+    wrapper.style.display = 'block';
+    empty.style.display = 'none';
+    
+    tbody.innerHTML = plateData.map((p, i) => {
+        const sqmWithFire = p.sqm * (1 + params.fireRate/100);
+        const plateCost = p.pricePerSqm * sqmWithFire;
+        const workshopCost = params.workshopRate * sqmWithFire;
+        const totalCost = plateCost + workshopCost;
+        const finalPrice = totalCost * (1 + params.profitRate/100);
+        const pricePerSqm = finalPrice / sqmWithFire;
+        
+        return `<tr>
+            <td>${p.name}</td>
+            <td>₺${p.pricePerSqm.toLocaleString('tr-TR', {maximumFractionDigits: 0})}</td>
+            <td>${p.sqm.toFixed(4)}</td>
+            <td>${sqmWithFire.toFixed(4)}</td>
+            <td>₺${workshopCost.toLocaleString('tr-TR', {maximumFractionDigits: 0})}</td>
+            <td>₺${pricePerSqm.toLocaleString('tr-TR', {maximumFractionDigits: 0})}</td>
+            <td><button class="danger" onclick="deletePlate(${i})">Sil</button></td>
+        </tr>`;
+    }).join('');
+    
+    updatePlateSelect();
+}
+
+function updatePlateSelect() {
+    const select = document.getElementById('plateSelect');
+    select.innerHTML = '<option value="">-- Plaka Seçin --</option>' + 
+        plateData.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+}
+
+function addPlate() {
+    const name = document.getElementById('plateName').value.trim();
+    const price = parseFloat(document.getElementById('platePrice').value);
+    const sqm = parseFloat(document.getElementById('plateSqm').value);
+    
+    if (!name || !price || !sqm) {
+        alert('Lütfen zorunlu alanları doldurunuz!');
+        return;
+    }
+    
+    plateData.push({ 
+        name, 
+        pricePerSqm: price, 
+        sqm, 
+        note: document.getElementById('plateNote').value.trim() 
+    });
+    
+    localStorage.setItem('plateData', JSON.stringify(plateData));
+    
+    document.getElementById('plateName').value = '';
+    document.getElementById('platePrice').value = '';
+    document.getElementById('plateSqm').value = '';
+    document.getElementById('plateNote').value = '';
+    
+    renderPlates();
+}
+
+function deletePlate(i) {
+    plateData.splice(i, 1);
+    localStorage.setItem('plateData', JSON.stringify(plateData));
+    renderPlates();
+}
+
+function calculateCut() {
+    const selectedIndex = document.getElementById('plateSelect').value;
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
+    
+    if (!selectedIndex || selectedIndex === '') {
+        alert('Lütfen plaka seçin!');
+        return;
+    }
+    
+    const plate = plateData[selectedIndex];
+    const params = getCalculationParams();
+    
+    const sqmWithFire = plate.sqm * (1 + params.fireRate/100);
+    const totalSqm = sqmWithFire * quantity;
+    
+    const plateCostPerUnit = plate.pricePerSqm * sqmWithFire;
+    const workshopCostPerUnit = params.workshopRate * sqmWithFire;
+    const totalCostPerUnit = plateCostPerUnit + workshopCostPerUnit;
+    
+    const totalCost = totalCostPerUnit * quantity;
+    const profit = totalCost * (params.profitRate / 100);
+    const finalPrice = totalCost + profit;
+    
+    document.getElementById('resultSqm').textContent = totalSqm.toFixed(4);
+    document.getElementById('resultPlateCost').textContent = '₺' + plateCostPerUnit.toLocaleString('tr-TR', {maximumFractionDigits: 0});
+    document.getElementById('resultWorkshopCost').textContent = '₺' + workshopCostPerUnit.toLocaleString('tr-TR', {maximumFractionDigits: 0});
+    document.getElementById('resultTotalCost').textContent = '₺' + totalCost.toLocaleString('tr-TR', {maximumFractionDigits: 0});
+    document.getElementById('resultProfit').textContent = '₺' + profit.toLocaleString('tr-TR', {maximumFractionDigits: 0});
+    document.getElementById('resultFinalPrice').textContent = '₺' + finalPrice.toLocaleString('tr-TR', {maximumFractionDigits: 0});
+    
+    const formula = `
+Plaka m² Fiyatı: ₺${plate.pricePerSqm.toLocaleString('tr-TR', {maximumFractionDigits: 0})}
+Fire Oranı: %${params.fireRate}
+m² (Fire ile): ${sqmWithFire.toFixed(4)}
+Kesim Adet: ${quantity}
+Toplam m²: ${totalSqm.toFixed(4)}
+
+MALIYET HESAPLAMASI:
+├─ Plaka Maliyeti: ₺${plate.pricePerSqm.toLocaleString('tr-TR', {maximumFractionDigits: 0})}/m² × ${sqmWithFire.toFixed(4)} = ₺${plateCostPerUnit.toLocaleString('tr-TR', {maximumFractionDigits: 0})}/kesim
+├─ Atölye Maliyeti: ₺${params.workshopRate.toLocaleString('tr-TR', {maximumFractionDigits: 0})}/m² × ${sqmWithFire.toFixed(4)} = ₺${workshopCostPerUnit.toLocaleString('tr-TR', {maximumFractionDigits: 0})}/kesim
+└─ Toplam Maliyet/Kesim: ₺${totalCostPerUnit.toLocaleString('tr-TR', {maximumFractionDigits: 0})}
+
+${quantity} ADET İÇİN:
+├─ Toplam Maliyet: ₺${totalCost.toLocaleString('tr-TR', {maximumFractionDigits: 0})}
+├─ Delta Kârı (%${params.profitRate}): ₺${profit.toLocaleString('tr-TR', {maximumFractionDigits: 0})}
+└─ SATIŞ FİYATI: ₺${finalPrice.toLocaleString('tr-TR', {maximumFractionDigits: 0})}
+    `;
+    
+    document.getElementById('formulaBreakdown').textContent = formula;
+    document.getElementById('resultCard').style.display = 'block';
+    
+    window.currentCalculation = {
+        customer: document.getElementById('customerName').value || 'Belirtilmemiş',
+        plateName: plate.name,
+        quantity,
+        totalSqm,
+        totalCost,
+        profit,
+        finalPrice,
+        date: new Date().toLocaleDateString('tr-TR')
+    };
+}
+
+function saveCalculation() {
+    if (!window.currentCalculation) return;
+    calculations.push(window.currentCalculation);
+    localStorage.setItem('calculations', JSON.stringify(calculations));
+    alert('Hesaplama kaydedildi!');
+}
+
+function resetCalculator() {
+    document.getElementById('customerName').value = '';
+    document.getElementById('plateSelect').value = '';
+    document.getElementById('quantity').value = '1';
+    document.getElementById('resultCard').style.display = 'none';
+}
+
+function renderHistory() {
+    const tbody = document.getElementById('historyTable');
+    const wrapper = document.getElementById('historyTableWrapper');
+    const empty = document.getElementById('emptyHistory');
+    
+    if (calculations.length === 0) {
+        wrapper.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+    }
+    
+    wrapper.style.display = 'block';
+    empty.style.display = 'none';
+    
+    tbody.innerHTML = calculations.map((c, i) => `<tr>
+        <td>${c.date}</td>
+        <td>${c.customer}</td>
+        <td>${c.plateName}</td>
+        <td>${c.quantity}</td>
+        <td>${c.totalSqm.toFixed(4)}</td>
+        <td>₺${c.finalPrice.toLocaleString('tr-TR', {maximumFractionDigits: 0})}</td>
+        <td><button class="danger" onclick="deleteCalculation(${i})">Sil</button></td>
+    </tr>`).join('');
+}
+
+function deleteCalculation(i) {
+    calculations.splice(i, 1);
+    localStorage.setItem('calculations', JSON.stringify(calculations));
+    renderHistory();
+}
+
+function clearHistory() {
+    if (confirm('Tüm geçmiş silinecek. Emin misiniz?')) {
+        calculations = [];
+        localStorage.setItem('calculations', JSON.stringify(calculations));
+        renderHistory();
+    }
+}
+
+renderPlates();
+</script>
+
+</body>
+</html>
